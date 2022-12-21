@@ -1,0 +1,19 @@
+{
+  "name": "schoolmanagement-backend",
+  "version": "1.0.0",
+  "description": "node js with express js to build a web service in rest api for managing pfa and pfe projects for the university",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/majed1458/universityManagement.git"
+  },
+  "author": "majed ben khalifa, welid mensi and ahmed horri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/majed1458/universityManagement/issues"
+  },
+  "homepage": "https://github.com/majed1458/universityManagement#readme"
+}
