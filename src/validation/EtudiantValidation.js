@@ -8,7 +8,7 @@ exports.createEtudiantValidation = (req) => [
   check("classe", "classe is required").not().isEmpty(),
   check("date_de_naissance", "date de naisance is required").not().isEmpty(),
  
-  check("alumni", "value diplome is required").not().isEmpty().isBoolean(),
+  
   (req, res, next) => {
     const errors = validationResult(req);
     console.log("wselethne")
@@ -18,16 +18,5 @@ exports.createEtudiantValidation = (req) => [
   },
 
 ];
-exports.loginvalidation = () => [
-  check("email", "enter a valid email").not().isEmpty(),
-  check("password", "enter a valid password").isLength({ min: 6 }),
-];
 
 
-exports.validations=(req,res,next)=>{
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next()
-}

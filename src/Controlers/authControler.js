@@ -1,6 +1,6 @@
 const { User } =require('../models/User') ;
 const {randomString } =require('../helpers/Utils')
-const SendResetPasswordLink =require('../helpers/Mail');
+const {SendResetPasswordLink} =require('../helpers/Mail');
 
 
 const generateAccessToken = require("../helpers/AccessToken");
@@ -12,8 +12,8 @@ const generateAccessToken = require("../helpers/AccessToken");
  */
 const Login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-    const getUser = await User.findOne({ email,role });
+    const { login, password, role,remember } = req.body;
+    const getUser = await User.findOne({ login,role });
     const checkPassword = getUser.passwordMatches(password)
     if (!checkPassword) {
       return res
@@ -43,7 +43,8 @@ const forgotPassword = async (req, res, next) => {
     const user = await User.findOne({ email: reqEmail });
     if (!user) {
       // RETURN A GENERIC ERROR - DON'T EXPOSE the real reason (user not found) for security.
-      return next({ message: 'Invalid request' });
+      return res.status(401)
+      .json({ Message: "email is incorrect", Success: false });
     }
     // user found => generate temp password, then email it to user:
     const { name, email } = user;
@@ -51,17 +52,42 @@ const forgotPassword = async (req, res, next) => {
     user.password = tempPass;
     await user.save();
    const token= generateAccessToken(user,"12h")
-  await SendResetPasswordLink(user.email,token)
+  SendResetPasswordLink(reqEmail,token).then(data=>{
+
     return res
-      .status(202)
-      .json({ Message: "email sent", Success: true});;
+    .status(202)
+    .json({ Message: "email sent", Success: true});
+  }
+  )
+
   } catch (error) {
-    return next(error);
+    return res.status(401)
+    .json({ Message: error.Message, Success: false });
   }
 };
+const changePass =async(req,res,next)=>{
 
+
+  try {
+    const token = req.body.token.replace("Bearer", "").trim();
+    console.log(token);
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    
+    const userVerif = await User.findOne({email: decoded.email})
+    userVerif.password = req.body.newPass;
+    await userVerif.save()
+    return res
+    .status(202)
+    .json({ Message: "password changed succesfuly", Success: true});
+    
+}catch (error) {
+  return res.status(401)
+  .json({ Message: error.Message, Success: false });
+}
+}
 
 module.exports={
   Login,
-  forgotPassword
+  forgotPassword,
+  changePass
 }

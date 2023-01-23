@@ -1,7 +1,11 @@
 const express = require('express');
-const validate = require('express-validation');
-const {Login}=require ("../Controlers/authControler")
+const {loginvalidation, forgetlidation}=require("../validation/authValidation")
+const {Login, forgotPassword, changePass}=require ("../Controlers/authControler")
 const router = express.Router();
 
-router.post("login",Login)
+router.post("/login",loginvalidation(),Login)
+router.post("/forgotPassword",forgetlidation(),forgotPassword)
+router.put("/changePass",forgetlidation(),changePass)
+
+
 module.exports=router

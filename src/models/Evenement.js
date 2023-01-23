@@ -1,22 +1,34 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const droit =['JPO','JOURNE_INTEGRATION','APPEL_FORMATION']
-
-
-const EvennementSchema = new mongoose.Schema(
-    {
-        dateEven: {
-            type: Date,
-            required: true
-        },
-        designation :{
-            type: String,
-            enum: droit
-        },
-        description:{
-            type:String
-        }
-    })
-
-const Event = mongoose.model('Evennement', EvennementSchema);
-module.exports =Event
+const EventModel = new Schema(
+  {
+    eventName: {
+      type: String,
+      required: true,
+    },
+    eventDate: {
+      type: Date,
+      required: true,
+    },
+    eventType: {
+      type: String,
+      enum: ["JPO", "journe d'integration ", "formation"],
+      default: "JPO",
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+      default: "isamm",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+module.exports = mongoose.model("Event", EventModel);

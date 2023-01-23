@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 /**
  * User Roles
  */
-const roles = ['Etudiant', 'Directeur_Stage', 'enseignant', 'Administratif'];
+const roles = ['Etudiant', 'Directeur_Stage', 'enseignant', 'Administratif',"Alumni"];
 const droit =['GERER_ETUDIANT','GERER_EVENNEMENT','GERER_ENSEIGNATS']
 
 
@@ -14,12 +14,21 @@ const UserSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      match: /^\S+@\S+\.\S+$/,
+     
       required: true,
       unique: true,
       trim: true,
       lowercase: true,
-      index: { unique: true }
+ 
+    },
+    login: {
+      type: String,
+     
+      required: true,
+   
+      trim: true,
+     
+      
     },
     password: {
       type: String,
@@ -45,7 +54,13 @@ const UserSchema = new mongoose.Schema(
 
     },
     date_de_naissance: {
-      type: String
+      type: String,
+      validate: {
+        validator: function (v) {
+            return /\d{2}-\d{2}-\d{4}/.test(v);
+        },
+        message: props => `${props.value} is not a valid year value!`
+    },
     },
     niveau: {
       type: String,
@@ -59,10 +74,10 @@ const UserSchema = new mongoose.Schema(
       index: true,
       trim: true
     },
-    alumni: {
-      type: Boolean,
+    // alumni: {
+    //   type: Boolean,
       
-    },
+    // },
 
     cv: {
       type: String,
@@ -83,12 +98,20 @@ const UserSchema = new mongoose.Schema(
     role:{
       type: String,
       enum: roles,
-      default: 'Etudiant'
+      default: 'Etudiant',
+    },
+    isResposable:{
+      type: Boolean
+    },
+    responsableFormation:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     access:[{
       droit:{
           type: String,
-          enum: droit
+          enum: droit,
+         
         
       }
       }]

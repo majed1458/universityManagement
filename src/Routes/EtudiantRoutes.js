@@ -5,10 +5,13 @@ const { createEtudiant,
     updateEtudiant, 
     getAllEtudiant,
     uploadMultiple,
-    getOneStudent} = require('../Controlers/EtudiantControler');
+    getOneStudent,
+    updatePublic,
+    getAllPublicEtudiant} = require('../Controlers/EtudiantControler');
 const express = require('express');
 const multer = require('multer');
-const path = require("path")
+const path = require("path");
+const { GererEtudiant, logged, isEtudiant } = require("../helpers/roleAccess");
 
 const router = express.Router();
 
@@ -28,11 +31,15 @@ const upload = multer({
 })
 
 
-router.post("/ajoutEtudiant",createEtudiantValidation(),createEtudiant)
-router.post("/addMultiple_Student_csv",upload.single("students_csv"),uploadMultiple)
-router.get("/getAll",getAllEtudiant)
+router.post("/ajoutEtudiant",logged,GererEtudiant,createEtudiantValidation(),createEtudiant)
+router.post("/addMultiple_Student_csv",logged,GererEtudiant,upload.single("students_csv"),uploadMultiple)
+router.get("/getAll",logged,GererEtudiant,getAllEtudiant)
+router.get("/getAllPublic",logged,isEtudiant,getAllPublicEtudiant)
+
+router.put("/updatePublic",logged,isEtudiant,updatePublic)
+router.put("/updateEtudiant/:_id",logged,GererEtudiant,updateEtudiant)
+
 router.get("/getOne/:_id",getOneStudent)
 
-router.put("/updateEtudiant/:_id",updateEtudiant)
 
 module.exports=router

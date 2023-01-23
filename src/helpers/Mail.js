@@ -1,6 +1,6 @@
 const transporter = require("../config/nodeMailer");
 // ---------------------------------------------
-const SendResetPasswordLink = (email, token) => {
+const SendResetPasswordLink =async (email, token) => {
   const mailOptions = {
     to: email,
     subject: "Reset password instructions",
