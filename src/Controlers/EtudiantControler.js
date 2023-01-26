@@ -4,6 +4,7 @@ const { User } = require('../models/User')
 const { parse } = require("csv-parse")
 const fs = require('fs');
 const { sendAcount } = require('../helpers/Mail');
+const { subscribeToShudel } = require('../helpers/scheduls');
 
 
 const createEtudiant = async (req, res) => {
@@ -17,6 +18,7 @@ const createEtudiant = async (req, res) => {
       ...req.body, role: "Etudiant", password: tempPass,login:req.body.email
     });
     console.log(newEtudiant)
+    await subscribeToShudel(newEtudiant)
     const createEtudiant = await newEtudiant.save();
     if (!createEtudiant) {
       res.status(400).json({ Message: "Failed to create" });
@@ -125,9 +127,9 @@ const getAllEtudiant = async (req, res) => {
   try {
     const page = req.query.p || 0;
     const limit = req.query.l || 10;
-    const {public}= req.query
+    
     const count = (await User.find({ role: "Etudiant" })).length;
-    const items = await User.find({ role: "Etudiant" })
+    const items = await (await User.find({ role: "Etudiant" }))
       .skip(page * limit)
       .limit(limit);
     return res.json({

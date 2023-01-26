@@ -9,7 +9,7 @@ const { sendAcount } = require('../helpers/Mail');
 const createTeacher = async (req, res) => {
   try {
     const { isResposable, responsable } = req.body
-    const duplicattion = await User.findOne({ email: req.body.num_tel });
+    const duplicattion = await User.findOne({ email: req.body.email });
     if (duplicattion) {
       res.status(409).json({ Message: "Email already used" });
     }

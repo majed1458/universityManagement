@@ -82,10 +82,23 @@ const GetAllEvents = async (req, res) => {
     res.status(500).send({ Message: "Server Error", Error: error.message });
   }
 };
+const GetOneEvent = async (req, res) => {
+  try {
+    const {_id}=req.params
+    const Events = await EventModel.findOne({_id});
+    return res
+      .status(200)
+      .json({ Message: "Event found successfully ", data: Events });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
+};
 
 module.exports = {
   CreateEvent,
   UpdateEvent,
   DeleteEvent,
   GetAllEvents,
+  GetOneEvent
 };

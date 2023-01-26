@@ -1,33 +1,21 @@
-const Joi = require("joi");
-const ProjectModel = require("../models/project.module");
-const studentModule = require("../models/user.module");
-const teacherModel = require("../models/user.module");
+const cvModel = require("../models/cv.model");
+const ProjectModel = require("../models/projetModel");
+const studentModule = require("../models/User");
 
-const validationProject = Joi.object({
-  title: Joi.date().required(),
-  type: Joi.string().valid("PFA", "PFE", "Stage"),
-  description: Joi.string().required(),
-});
-const CreateProject = async (req, res) => {
+
+const CreateProjectPfa = async (req, res) => {
   try {
     const {
       title,
       description,
-      type,
-      students,
-      encadrants,
       technologies,
-      societe,
-      nbr_students_max,
-      startDate,
-      endDate,
-      isValidatedByReponsable,
+     
     } = req.body;
 
     const existProject = await ProjectModel.findOne({
-      encadrants,
-      students,
-      startDate,
+      title,
+      description,
+      type: "PFA"
     });
     if (existProject)
       return res.status(409).json({
@@ -38,96 +26,205 @@ const CreateProject = async (req, res) => {
     const newProject = new ProjectModel({
       title: title,
       description: description,
-      type: type,
-      students: students,
-      encadrants: encadrants,
+      type: "PFA",
+
       technologies: technologies,
-      nbr_students_max: nbr_students_max,
-      startDate: startDate,
-      endDate: endDate,
-      isValidatedByReponsable: isValidatedByReponsable,
+     
+
+      isValidatedByReponsable: false,
+      publisher: req.user._id
     });
     console.log("######[" + JSON.stringify(newProject) + "]######:");
+    await newProject.save()
+    return res.status(200).json({
+      Message: "Project created suucessfully",
+      Success: true,
+      data: newProject,
+    });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
+};
+const CreateStage = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      technologies,
+      societe,
+      startDate,
+      endDate
 
-    switch (type) {
-      case "PFA":
-        {
-          //is created by teacher test token teacher
-          //does encadrant 1 only exist
-          if (encadrants) {
-            // exists teacher
-            const existTeacher = await teacherModel.findOne({
-              _id: encadrants[0],
-            });
-          }
+    } = req.body;
 
-          const createdProject = await newProject.save();
-          return res.status(200).json({
-            Message: "Project created suucessfully",
-            Success: true,
-            data: createdProject,
-          });
-        }
-        break;
-      case "PFE":
-        {
-          const existsStudents = await studentModule.find({ _id: students });
+    const existProject = await ProjectModel.findOne({
+      title,
+      description,
+      type: "Stage"
+    });
+    if (existProject)
+      return res.status(409).json({
+        Message: "Project already exist",
+        Success: false,
+      });
+    console.log(req.params);
+    const newProject = new ProjectModel({
+      title: title,
+      description: description,
+      type: "Stage",
+      technologies: technologies,
+      publisher: req.user._id,
+      societe,
+      startDate,
+      endDate
+    });
+    console.log("######[" + JSON.stringify(newProject) + "]######:");
+    await newProject.save()
+    return res.status(200).json({
+      Message: "Project created suucessfully",
+      Success: true,
+      data: newProject,
+    });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
+};
+const CreatePfe = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      technologies,
+      societe,
+      startDate,
+      endDate,
+      
 
-          //does students exist
-          if (!existsStudents) {
-            return res.status(500).json({
-              Message: "Students does not exist",
-              Success: false,
-            });
-          }
-          // const existSociete=await societeModule.find({ _id:societe });
-          const existSociete = true;
-          if (!existSociete) {
-            return res.status(500).json({
-              Message: "Societé does not exist",
-              Success: false,
-            });
-          }
-          const createdProject = await newProject.save();
-          return res.status(200).json({
-            Message: "Project created suucessfully",
-            Success: true,
-            data: createdProject,
-          });
-        }
-        break;
-      //stage
-      default: {
-        // const existSociete=await societeModule.find({ _id:societe });
-        const existSociete = true;
-        if (!existSociete) {
-          return res.status(500).json({
-            Message: "Societé does not exist",
-            Success: false,
-          });
-        }
-        const createdProject = await newProject.save();
-        return res.status(200).json({
-          Message: "Project created suucessfully",
-          Success: true,
-          data: createdProject,
-        });
-      }
-    }
+
+    } = req.body;
+
+    const existProject = await ProjectModel.findOne({
+      title,
+      description,
+      type: "PFE"
+    });
+    if (existProject)
+      return res.status(409).json({
+        Message: "Project already exist",
+        Success: false,
+      });
+    console.log(req.params);
+    const newProject = new ProjectModel({
+      title,
+      description,
+      technologies,
+      societe,
+     
+      startDate,
+      endDate,
+     
+      type: "PFE",
+
+      publisher: req.user._id
+    });
+    console.log("######[" + JSON.stringify(newProject) + "]######:");
+    await newProject.save()
+    return res.status(200).json({
+      Message: "Project created suucessfully",
+      Success: true,
+      data: newProject,
+    });
   } catch (error) {
     console.log("##########:", error);
     res.status(500).send({ Message: "Server Error", Error: error.message });
   }
 };
 
-const GetProjectsContainingTechnologies = async (req, ress) => {
-  // #swagger.tags = ['Project apis']
-  // #swagger.description = 'Endpoint retun list projects by given technologies '
+const GetTeacherProjects = async (req, res) => {
+
+
+  try {
+    const Projects = await ProjectModel.find({ publisher: req.user._id });
+    return res
+      .status(200)
+      .json({ Message: "Projects found successfully ", data: Projects });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
+};
+const selectPfa = async (req, res) => {
+  try {
+    const { _id } = req.params
+    const Project = await ProjectModel.find({ _id, type: "PFA" });
+    if (!Project) {
+      return res.status(409).json({
+        Message: "Project don t exist",
+        Success: false,
+      });
+    }
+    if (Project.PFAstudents) {
+      return res.status(409).json({
+        Message: "Project has been selected by other",
+        Success: false,
+      });
+    }
+    Project.PFAstudents = req.use._id
+    await Project.save()
+    return res
+      .status(200)
+      .json({ Message: "Projects found successfully ", data: Project });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
+};
+const selectPfe = async (req, res) => {
+  try {
+    const { _id } = req.params
+    const Project = await ProjectModel.find({ _id });
+    if (!Project) {
+      return res.status(409).json({
+        Message: "Project don t exist",
+        Success: false,
+      });
+    }
+    Project.encadrant = req.user._id
+    await Project.save()
+    return res
+      .status(200)
+      .json({ Message: "Projects found successfully ", data: Project });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
+};
+const getEtudiantPfe = async (req, res) => {
+  try {
+    const { _id } = req.params
+    const Project = await ProjectModel.find({ _id, type: "PFE" });
+    if (!Project) {
+      return res.status(409).json({
+        Message: "Project don t exist",
+        Success: false,
+      });
+    }
+    const etudiant = await studentModule.findOne({ _id: Preject.publisher })
+    const studentCv = await cvModel.findOne({ student: Preject.publisher })
+
+    await Project.save()
+    return res
+      .status(200)
+      .json({ Message: "Projects found successfully ", etudiant, studentCv });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: "Server Error", Error: error.message });
+  }
 };
 
 const GetAllProjects = async (req, res) => {
-  // #swagger.tags = ['Project apis']
-  // #swagger.description = 'Endpoint retun all projects list '
 
   try {
     const Projects = await ProjectModel.find();
@@ -142,9 +239,7 @@ const GetAllProjects = async (req, res) => {
 
 const GetAllProjectsByType = async (req, res) => {
   const { type } = req.params;
-  // #swagger.tags = ['Project apis']
-  // #swagger.description = 'Endpoint return  projects list by given type'
-  // #swagger.parameters['type'] = { description: 'type of projects to return  .' }
+
   try {
     const Projects = await ProjectModel.find({ type });
     return res
@@ -157,7 +252,13 @@ const GetAllProjectsByType = async (req, res) => {
 };
 
 module.exports = {
-  CreateProject,
+  CreateProjectPfa,
   GetAllProjects,
   GetAllProjectsByType,
+  GetTeacherProjects,
+  CreateStage,
+  selectPfa,
+  CreatePfe,
+  selectPfe,
+  getEtudiantPfe
 };

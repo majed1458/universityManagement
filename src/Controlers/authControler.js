@@ -14,6 +14,11 @@ const Login = async (req, res) => {
   try {
     const { login, password, role,remember } = req.body;
     const getUser = await User.findOne({ login,role });
+    if (!getUser) {
+      return res
+        .status(401)
+        .json({ Message: "user not found", Success: false });
+    }
     const checkPassword = getUser.passwordMatches(password)
     if (!checkPassword) {
       return res
@@ -31,7 +36,27 @@ const Login = async (req, res) => {
   }
 };
 
-
+const signup = async (req, res) => {
+  try {
+    const duplicattion = await User.findOne({ email: req.body.email });
+    if (duplicattion) {
+      return res.status(409).json({ Message: "Email already used" });
+    }
+ 
+    const newEtudiant = new User({
+      ...req.body, role: "Alummni", password: req.body.password,login:req.body.email
+    });
+    console.log(newEtudiant)
+    const createEtudiant = await newEtudiant.save();
+    if (!createEtudiant) {
+      res.status(400).json({ Message: "Failed to create" });
+    }
+    return res.status(201).json({ Message: "Account successfully created" });
+  } catch (error) {
+    console.log("##########:", error);
+    res.status(500).send({ Message: error._message, Error: error.message });
+  }
+};
 
 /**
  * Send email to a registered user's email with a one-time temporary password
@@ -89,5 +114,5 @@ const changePass =async(req,res,next)=>{
 module.exports={
   Login,
   forgotPassword,
-  changePass
+  changePass,signup
 }

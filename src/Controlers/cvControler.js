@@ -1,5 +1,5 @@
 const CvModule = require("../models/cv.model");
-const UserModule = require("../models/user.module");
+const UserModule = require("../models/User");
 
 const CreateCv = async (req, res) => {
   try {

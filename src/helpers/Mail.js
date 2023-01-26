@@ -31,4 +31,20 @@ const sendAcount = (user) => {
     }
   });
 };
-module.exports = {SendResetPasswordLink,sendAcount};
+
+const updateAccount = (user) => {
+  const mailOptions = {
+    to: user.email,
+    subject: "acount login",
+    html: `merci de mettre a jours votre compte `,
+  };
+  transporter.sendMail(mailOptions, (error) => {
+    if (error) {
+      console.log("########################################################");
+      console.log(error);
+    } else {
+      console.log("Message sent!");
+    }
+  });
+};
+module.exports = {SendResetPasswordLink,sendAcount,updateAccount};

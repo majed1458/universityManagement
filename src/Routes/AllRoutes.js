@@ -5,7 +5,8 @@ const etudiantRoutes = require("./EtudiantRoutes");
 const saisonRoutes = require("./Saison.routes");
 const evenRoutes = require('./eventRoutes')
 const teacherRoutes = require('./enseignant')
-
+const projectRoutes =require("./project")
+const cvRoutes =require("./cvRoutes")
 const auth = require("./Auth");
 
 //---------------------------------------------------------
@@ -16,6 +17,12 @@ router.use("/admin", adminRouter);
 router.use("/Etudiant", etudiantRoutes);
 router.use("/Saison", saisonRoutes);
 router.use("/Event", evenRoutes);
+router.use("/project", projectRoutes);
+router.use("/cv", cvRoutes);
+
+
+
+
 
 router.use("/teacher", teacherRoutes);
 

@@ -32,7 +32,7 @@ exports.isDirecteurStage = (req, res, next) => {
 }
 exports.isEtudiant = (req, res, next) => {
   console.log(req.user);
-  if (req.user.role !== "Etudiant") {
+  if (req.user.role !== "Etudiant" || req.user.role !== "Alumni") {
     res.status(302).json({ success: false, message: "vous n'etes pas etudiant" });
   }
 
@@ -44,19 +44,19 @@ exports.GererEtudiant = (req, res, next) => {
 
   try {
     console.log(req.user);
- 
+    let haveacces = false
     if (req.user.role === 'Administratif') {
-      const getAcces = req.user.access.find(elem => { elem.droit = "GERER_ETUDIANT" })
-      console.log(getAcces)
-      if (getAcces == -1) {
+      const getAcces = req.user.access.forEach(elem => { elem.droit = 'GERER_ETUDIANT' ? haveacces = true : haveacces; })
+      console.log(haveacces)
+      if (!haveacces) {
         return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
       }
+      return next()
+    }
+    if (req.user.role === 'Directeur_Stage') {
       next()
     }
-    if (req.user.role === 'Directeur_Stage'){
-      next()
-    }
-    else{
+    else {
       return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
     }
   } catch (err) {
@@ -67,41 +67,70 @@ exports.GererEtudiant = (req, res, next) => {
 exports.GererEvent = (req, res, next) => {
   try {
     if (req.user.role === 'Administratif') {
-      const getAcces = req.user.access.find(elem => { elem.droit = "GERER_EVENNEMENT" })
-      console.log(getAcces)
-      if (getAcces == -1) {
+      let haveacces = false
+      const getAcces = req.user.access.forEach(elem => { elem.droit = "GERER_EVENNEMENT"? haveacces = true : haveacces;  })
+      console.log(haveacces)
+      if (!haveacces) {
         return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
       }
       next()
     }
-    if (req.user.role === 'Directeur_Stage'){
+    if (req.user.role === 'Directeur_Stage') {
       next()
     }
-    else{
+    else {
       return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
     }
   } catch (err) {
     return res.status(302).json({ success: false, message: err.message });
   }
-  };
+};
 exports.GererTeacher = (req, res, next) => {
   try {
-  if (req.user.role === 'Administratif') {
-    const getAcces = req.user.access.find(elem => { elem.droit = "GERER_ENSEIGNATS" })
-    console.log(getAcces)
-    if (getAcces == -1) {
+    if (req.user.role === 'Administratif') {
+      let haveacces = false
+      const getAcces = req.user.access.find(elem => { elem.droit = "GERER_ENSEIGNATS"? haveacces = true : haveacces; })
+      console.log(haveacces)
+      if (!haveacces) {
+        return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
+      }
+      return next()
+    }
+    if (req.user.role === 'Directeur_Stage') {
+     return next()
+    }
+    else {
       return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
     }
-    next()
+  } catch (err) {
+    return res.status(302).json({ success: false, message: err.message });
   }
-  if (req.user.role === 'Directeur_Stage'){
-    next()
-  }
-  else{
-    return res.status(302).json({ success: false, message: "vous n avez pas l acces" });
-  }
-} catch (err) {
-  return res.status(302).json({ success: false, message: err.message });
-}
 };
+exports.isAlumni = (req, res, next) => {
+  console.log(req.user);
+  if (req.user.role !== "Alumni") {
+    res.status(302).json({ success: false, message: "vous n'etes pas alumni" });
+  }
 
+
+  next();
+}
+exports.isTeacher = (req, res, next) => {
+  console.log(req.user);
+  if (req.user.role !== "enseignant") {
+    res.status(302).json({ success: false, message: "vous n'etes pas enseignat" });
+  }
+
+
+  next();
+}
+
+exports.isEtudiantNotAlumni = (req, res, next) => {
+  console.log(req.user);
+  if (req.user.role !== "Etudiant") {
+    res.status(302).json({ success: false, message: "vous n'etes pas etudiant" });
+  }
+
+
+  next();
+}

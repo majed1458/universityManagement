@@ -12,7 +12,9 @@ router.post(
   EventController.CreateEvent
 );
 router.get("/getAll", EventController.GetAllEvents);
+router.get("/getOne/:_id", EventController.GetOneEvent);
 router.put("/update/:_id",logged,GererEvent, EventController.UpdateEvent);
+
 router.delete("/delete/:_id",logged,GererEvent, EventController.DeleteEvent);
 
 module.exports = router;

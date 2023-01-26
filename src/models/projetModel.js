@@ -3,34 +3,33 @@ const Schema = mongoose.Schema;
 
 const ProjectModel = new Schema(
   {
-    students: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
 
-    encadrants: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    technologies: [
-      {
+
+
+    encadrant:
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    technologies: [{
+      name: {
         type: String,
-       
-      },
-    ],
 
+      }
+    }],
+    PFAstudents: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     societe: {
-      type:String,
-      
+      type: String,
+
     },
     type: {
       type: String,
       enum: ["PFA", "PFE", "Stage"],
-      
+
       required: true,
     },
     title: {
@@ -45,7 +44,10 @@ const ProjectModel = new Schema(
       type: Number,
       //  default: 2,
     },
-
+    publisher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     startDate: {
       type: Date,
     },
@@ -54,7 +56,8 @@ const ProjectModel = new Schema(
       type: Date,
     },
     isValidatedByReponsable: {
-      type: Boolean,
+      type: Boolean
+      
     },
   },
   {
