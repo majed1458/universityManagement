@@ -106,7 +106,7 @@ const updatePublic = async (req, res) => {
     const { _id } = req.user;
     
     const { isPublic } = req.body;
-
+//tdfytfgh
   
     const updateAdmin = await User.findOneAndUpdate(
       { _id, role: "Etudiant" },
